@@ -1,6 +1,8 @@
 from typing import Any, List, Optional
 
-from langchain_community.document_loaders.base import BaseLoader
+from langchain_community.document_loaders.base import (
+    BaseLoader,
+)
 from langchain_core.documents import Document
 from rdflib import Graph
 
@@ -10,7 +12,11 @@ class OntologyLoader(BaseLoader):
     Load an OWL ontology and extract classes and properties as documents.
     """
 
-    def __init__(self, ontology_url: str, format: Optional[str] = None):
+    def __init__(
+        self,
+        ontology_url: str,
+        format: Optional[str] = None,
+    ):
         """
         Initialize the OntologyLoader.
 
@@ -21,15 +27,21 @@ class OntologyLoader(BaseLoader):
         self.ontology_url = ontology_url
         self.format = format
         self.graph = Graph(store="Oxigraph")
-        self.graph.parse(self.ontology_url, format=self.format)
+        self.graph.parse(
+            self.ontology_url, format=self.format
+        )
 
     def load(self) -> List[Document]:
         """Load and return documents (classes and properties) from the OWL ontology."""
         # Extract classes and properties as documents
         docs: List[Document] = []
-        for cls in self.graph.query(self._get_class_query()):
+        for cls in self.graph.query(
+            self._get_class_query()
+        ):
             docs.append(self._create_document(cls))
-        for prop in self.graph.query(self._get_property_query()):
+        for prop in self.graph.query(
+            self._get_property_query()
+        ):
             docs.append(self._create_document(prop))
         return docs
 
@@ -99,6 +111,8 @@ class OntologyLoader(BaseLoader):
                     ?pred = skos:definition ||
                     ?pred = rdfs:comment ||
                     ?pred = dcterms:description ||
+                    ?pred = rdfs:range ||
+                    ?pred = rdfs:domain ||
                     ?pred = dc:title
                 )
             }
